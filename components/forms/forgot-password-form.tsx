@@ -4,7 +4,6 @@ import { z } from "zod";
 
 const formSchema = z.object({
   email: z.email(),
-  password: z.string().min(6),
 });
 
 import { cn } from "@/lib/utils";
@@ -18,54 +17,47 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signInUser } from "@/server/users";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
-export function LoginForm({
+export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const res = await signInUser(values.email, values.password);
-      if (res.success) {
-        toast.success(res.message);
-        router.push("/dashboard");
+      const { error } = await authClient.requestPasswordReset({
+        email: values.email,
+        redirectTo: "/reset-password",
+      });
+      if (!error) {
+        toast.success(
+          "Please check your email for password reset instructions"
+        );
       } else {
-        toast.error(res.message);
+        toast.error(error.message);
       }
     } catch (error) {
       const e = error as Error;
@@ -79,8 +71,10 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Login with your valid Credentials</CardDescription>
+          <CardTitle className="text-xl">Forgot Password</CardTitle>
+          <CardDescription>
+            Enter your email to reset your password
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -91,7 +85,7 @@ export function LoginForm({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>email</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="m@example.com"
@@ -104,33 +98,6 @@ export function LoginForm({
                   )}
                 />
                 <Field>
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center">
-                          <FieldLabel htmlFor="password">Password</FieldLabel>
-                          <Link
-                            href="/forgot-password"
-                            className="ml-auto text-sm underline-offset-4 hover:underline"
-                          >
-                            Forgot your password?
-                          </Link>
-                        </div>
-                        <FormControl>
-                          <Input
-                            placeholder="******"
-                            type="password"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </Field>
-                <Field>
                   <Button
                     type="submit"
                     className="cursor-pointer"
@@ -139,13 +106,9 @@ export function LoginForm({
                     {isLoading ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
-                      "Login"
+                      "Send Reset Link"
                     )}
                   </Button>
-                  <FieldDescription className="text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup">Sign up</Link>
-                  </FieldDescription>
                 </Field>
               </FieldGroup>
             </form>

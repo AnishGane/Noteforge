@@ -1,13 +1,9 @@
-import React from "react";
-import LogoutPage from "../logout/page";
+import PageWrapper from "@/components/page-wrapper";
 
-function dashboardPage() {
+export default function Page() {
   return (
-    <div>
-      dashboardPage
-      <LogoutPage />
-    </div>
+    <PageWrapper breadCrumbs={[{ label: "Dashboard", path: "/dashboard" }]}>
+      <h1>Dashboard</h1>
+    </PageWrapper>
   );
 }
-
-export default dashboardPage;

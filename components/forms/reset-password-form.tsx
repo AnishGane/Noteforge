@@ -3,8 +3,8 @@
 import { z } from "zod";
 
 const formSchema = z.object({
-  email: z.email(),
   password: z.string().min(6),
+  confirmPassword: z.string().min(6),
 });
 
 import { cn } from "@/lib/utils";
@@ -18,54 +18,57 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signInUser } from "@/server/users";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
-export function LoginForm({
+export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const res = await signInUser(values.email, values.password);
-      if (res.success) {
-        toast.success(res.message);
-        router.push("/dashboard");
+      if (values.confirmPassword != values.password) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      const { error } = await authClient.resetPassword({
+        newPassword: values.password,
+        token: token ?? "",
+      });
+      if (!error) {
+        toast.success("Password reset successfully");
+        router.push("/login");
       } else {
-        toast.error(res.message);
+        toast.error(error.message);
       }
     } catch (error) {
       const e = error as Error;
@@ -79,30 +82,15 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Login with your valid Credentials</CardDescription>
+          <CardTitle className="text-xl">Reset Password</CardTitle>
+          <CardDescription>
+            Enter a new password for your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FieldGroup>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>email</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="m@example.com"
-                          type="email"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Field>
                   <FormField
                     control={form.control}
@@ -112,12 +100,34 @@ export function LoginForm({
                         <div className="flex items-center">
                           <FieldLabel htmlFor="password">Password</FieldLabel>
                           <Link
-                            href="/forgot-password"
+                            href="#"
                             className="ml-auto text-sm underline-offset-4 hover:underline"
                           >
                             Forgot your password?
                           </Link>
                         </div>
+                        <FormControl>
+                          <Input
+                            placeholder="******"
+                            type="password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </Field>
+                <Field>
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FieldLabel htmlFor="confirmPassword">
+                          Confirm Password
+                        </FieldLabel>
+
                         <FormControl>
                           <Input
                             placeholder="******"
@@ -139,13 +149,9 @@ export function LoginForm({
                     {isLoading ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
-                      "Login"
+                      "Reset Password"
                     )}
                   </Button>
-                  <FieldDescription className="text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup">Sign up</Link>
-                  </FieldDescription>
                 </Field>
               </FieldGroup>
             </form>

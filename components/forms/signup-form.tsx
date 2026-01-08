@@ -68,9 +68,9 @@ export function SignUpForm({
           values.password,
           values.name
         );
-        res.success ? toast.success(res.message) : toast.error(res.message);
-
-        
+        res.success
+          ? toast.success("Please check your email for verification")
+          : toast.error(res.message);
       }
     } catch (error) {
       const e = error as Error;
