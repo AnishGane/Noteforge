@@ -1,13 +1,13 @@
-import * as React from "react"
-import { ChevronRight } from "lucide-react"
+import * as React from "react";
+import { ChevronRight } from "lucide-react";
 
-import { SearchForm } from "@/components/search-form"
-import { VersionSwitcher } from "@/components/version-switcher"
+import { SearchForm } from "@/components/search-form";
+import { VersionSwitcher } from "@/components/version-switcher";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   Sidebar,
   SidebarContent,
@@ -19,151 +19,36 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { getNoteBooks } from "@/server/notebook";
 
-// This is sample data.
-const data = {
-  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
-  navMain: [
-    {
-      title: "Getting Started",
-      url: "#",
-      items: [
-        {
-          title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Building Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "API Reference",
-      url: "#",
-      items: [
-        {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
-        {
-          title: "Edge Runtime",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Architecture",
-      url: "#",
-      items: [
-        {
-          title: "Accessibility",
-          url: "#",
-        },
-        {
-          title: "Fast Refresh",
-          url: "#",
-        },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Community",
-      url: "#",
-      items: [
-        {
-          title: "Contribution Guide",
-          url: "#",
-        },
-      ],
-    },
-  ],
-}
+export async function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const notebooks = await getNoteBooks();
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const data = {
+    versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+    navMain:
+      notebooks.success && notebooks.data.notebooks
+        ? notebooks.data.notebooks.map((notebook) => {
+            // Filter notes for this notebook
+            const notebookNotes =
+              notebooks.data.notes?.filter(
+                (note) => note.notebookId.toString() === notebook._id.toString()
+              ) || [];
+
+            return {
+              title: notebook.name,
+              url: `dashboard/${notebook._id.toString()}`,
+              items: notebookNotes.map((note) => ({
+                title: note.title,
+                url: `dashboard/${notebook._id.toString()}/${note._id.toString()}`,
+              })),
+            };
+          })
+        : [],
+  };
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -197,7 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenu>
                     {item.items.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild isActive={item.isActive}>
+                        <SidebarMenuButton asChild>
                           <a href={item.url}>{item.title}</a>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -211,5 +96,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

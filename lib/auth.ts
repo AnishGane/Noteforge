@@ -1,12 +1,15 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { connectDB } from "@/lib/mongodb";
 import { nextCookies } from "better-auth/next-js";
 import { Resend } from "resend";
 import VerificationEmail from "@/components/emails/verification-email";
 import PasswordResetEmail from "@/components/emails/reset-password";
+import { MongoClient } from "mongodb";
 
-const db = await connectDB();
+const uri = process.env.MONGODB_URI!;
+
+const client = new MongoClient(uri);
+const db = client.db();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -46,6 +49,8 @@ export const auth = betterAuth({
       console.log(`Password for user ${user.email} has been reset.`);
     },
   },
-  database: mongodbAdapter(db),
+  database: mongodbAdapter(db, {
+    client,
+  }),
   plugins: [nextCookies()],
 });
