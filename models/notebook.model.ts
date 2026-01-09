@@ -16,7 +16,7 @@ const NotebookSchema = new Schema(
     },
   },
   {
-    timestamps: true, // createdAt, updatedAt
+    timestamps: true,
   }
 );
 

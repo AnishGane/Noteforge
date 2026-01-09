@@ -9,6 +9,7 @@ import {
 import { SidebarTrigger } from "./ui/sidebar";
 import LogoutPage from "@/app/logout/page";
 import { ModeToggle } from "./mode-toggle";
+import { Fragment } from "react/jsx-runtime";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -30,19 +31,24 @@ export default function PageWrapper({
             <SidebarTrigger />
             <Breadcrumb>
               <BreadcrumbList>
-                {breadCrumbs.map((breadcrumb) => (
-                  <BreadcrumbItem key={breadcrumb.path}>
-                    <BreadcrumbLink href={breadcrumb.path}>
-                      <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
+                {breadCrumbs.map((breadcrumb, index) => (
+                  <Fragment key={breadcrumb.path}>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink href={breadcrumb.path}>
+                        <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    {index !== breadCrumbs.length - 1 && (
+                      <BreadcrumbSeparator />
+                    )}
+                  </Fragment>
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-3">
-<ModeToggle/>
-          <LogoutPage />
+            <ModeToggle />
+            <LogoutPage />
           </div>
         </div>
       </header>

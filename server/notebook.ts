@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
+import { NoteDB, NotebookDB } from "@/types";
 import { ObjectId } from "mongodb";
 import { headers } from "next/headers";
 
@@ -42,55 +43,68 @@ export const createNoteBook = async (name: string) => {
 };
 
 export const getNoteBooks = async () => {
-    try {
-      const session = await auth.api.getSession({
-        headers: await headers(),
-      });
-      
-      const userId = session?.user?.id;
-      
-      if (!userId) {
-        return {
-          success: false,
-          message: "Please login to view notebooks",
-          data: { notebooks: [], notes: [] },
-        };
-      }
-      
-      const db = await connectDB();
-      
-      // Get all notebooks for the user
-      const notebooks = await db
-        .collection("notebooks")
-        .find({ userId })
-        .sort({ createdAt: -1 })
-        .toArray();
-  
-      // Get all notes for all notebooks
-      const notebookIds = notebooks.map((notebook) => notebook._id);
-      const notes = await db
-        .collection("notes")
-        .find({ notebookId: { $in: notebookIds } })
-        .sort({ updatedAt: -1 })
-        .toArray();
-  
-      return {
-        success: true,
-        message: "Notebooks fetched successfully",
-        data: {
-          notebooks,
-          notes,
-        },
-      };
-    } catch (err) {
-      const e = err as Error;
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    const userId = session?.user?.id;
+
+    if (!userId) {
       return {
         success: false,
-        message: e.message || "Error fetching notebooks",
+        message: "Please login to view notebooks",
         data: { notebooks: [], notes: [] },
       };
     }
-  };
+
+    const db = await connectDB();
+
+    // Fetch notebooks
+    const notebooks = await db
+      .collection<NotebookDB>("notebooks")
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    // Fetch notes for those notebooks
+    const notebookIds = notebooks.map((n) => n._id);
+
+    const notes = await db
+      .collection<NoteDB>("notes")
+      .find({ notebookId: { $in: notebookIds } })
+      .toArray();
+
+    // Build a count map: notebookId -> count
+    const notesCountMap = notes.reduce<Record<string, number>>((acc, note) => {
+      const key = note.notebookId.toString();
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Attach notesCount to each notebook
+    const notebooksWithCount = notebooks.map((notebook) => ({
+      ...notebook,
+      notesCount: notesCountMap[notebook._id.toString()] ?? 0,
+    }));
+
+    return {
+      success: true,
+      message: "Notebooks fetched successfully",
+      data: {
+        notebooks: notebooksWithCount,
+        notes,
+      },
+    };
+  } catch (err) {
+    const e = err as Error;
+    return {
+      success: false,
+      message: e.message || "Error fetching notebooks",
+      data: { notebooks: [], notes: [] },
+    };
+  }
+};
 
 export const getNoteBookById = async (id: string) => {
   try {

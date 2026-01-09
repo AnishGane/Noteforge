@@ -22,7 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
 import { createNoteBook } from "@/server/notebook";
@@ -70,7 +70,7 @@ export const CreateNoteBookButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>Create Notebook</Button>
+        <Button className="w-max cursor-pointer"><PlusIcon className="size-4" />Create Notebook</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

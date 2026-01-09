@@ -2,11 +2,19 @@
 
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
+import { NoteDB } from "@/types";
+import { JSONContent } from "@tiptap/react";
 import { ObjectId } from "mongodb";
 import { headers } from "next/headers";
 
+interface CreateNotePaylod{
+  title: string;
+  content: JSONContent;
+  notebookId: string;
+}
+
 // Create a new note
-export const createNote = async (notebookId: string, title?: string) => {
+export const createNote = async ({notebookId, title, content}: CreateNotePaylod) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -69,66 +77,66 @@ export const createNote = async (notebookId: string, title?: string) => {
 };
 
 // Get all notes for a specific notebook
-export const getNotesByNotebookId = async (notebookId: string) => {
-  try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+// export const getNotesByNotebookId = async (notebookId: string) => {
+//   try {
+//     const session = await auth.api.getSession({
+//       headers: await headers(),
+//     });
 
-    const userId = session?.user?.id;
-    if (!userId) {
-      return {
-        success: false,
-        message: "Please login to view notes",
-        data: [],
-      };
-    }
+//     const userId = session?.user?.id;
+//     if (!userId) {
+//       return {
+//         success: false,
+//         message: "Please login to view notes",
+//         data: [],
+//       };
+//     }
 
-    // Validate notebookId format
-    if (!ObjectId.isValid(notebookId)) {
-      return {
-        success: false,
-        message: "Invalid notebook ID format",
-        data: [],
-      };
-    }
+//     // Validate notebookId format
+//     if (!ObjectId.isValid(notebookId)) {
+//       return {
+//         success: false,
+//         message: "Invalid notebook ID format",
+//         data: [],
+//       };
+//     }
 
-    const db = await connectDB();
+//     const db = await connectDB();
 
-    // Verify the notebook belongs to the user
-    const notebook = await db.collection("notebooks").findOne({
-      _id: new ObjectId(notebookId),
-      userId,
-    });
+//     // Verify the notebook belongs to the user
+//     const notebook = await db.collection("notebooks").findOne({
+//       _id: new ObjectId(notebookId),
+//       userId,
+//     });
 
-    if (!notebook) {
-      return {
-        success: false,
-        message: "Notebook not found or you don't have permission",
-        data: [],
-      };
-    }
+//     if (!notebook) {
+//       return {
+//         success: false,
+//         message: "Notebook not found or you don't have permission",
+//         data: [],
+//       };
+//     }
 
-    const notes = await db
-      .collection("notes")
-      .find({ notebookId: new ObjectId(notebookId) })
-      .sort({ updatedAt: -1 })
-      .toArray();
+//     const notes = await db
+//       .collection("notes")
+//       .find({ notebookId: new ObjectId(notebookId) })
+//       .sort({ updatedAt: -1 })
+//       .toArray();
 
-    return {
-      success: true,
-      message: "Notes fetched successfully",
-      data: notes,
-    };
-  } catch (err) {
-    const e = err as Error;
-    return {
-      success: false,
-      message: e.message || "Error fetching notes",
-      data: [],
-    };
-  }
-};
+//     return {
+//       success: true,
+//       message: "Notes fetched successfully",
+//       data: notes,
+//     };
+//   } catch (err) {
+//     const e = err as Error;
+//     return {
+//       success: false,
+//       message: e.message || "Error fetching notes",
+//       data: [],
+//     };
+//   }
+// };
 
 // Get a single note by ID
 export const getNoteById = async (id: string) => {
@@ -156,7 +164,7 @@ export const getNoteById = async (id: string) => {
     }
 
     const db = await connectDB();
-    const note = await db.collection("notes").findOne({
+    const note = await db.collection<NoteDB>("notes").findOne({
       _id: new ObjectId(id),
     });
 
@@ -185,7 +193,7 @@ export const getNoteById = async (id: string) => {
     return {
       success: true,
       message: "Note fetched successfully",
-      data: note,
+      data: {...note, notebookName: notebook.name},
     };
   } catch (err) {
     const e = err as Error;
@@ -266,10 +274,9 @@ export const updateNote = async (
       updateData.content = updates.content;
     }
 
-    await db.collection("notes").updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updateData }
-    );
+    await db
+      .collection("notes")
+      .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
 
     return {
       success: true,
@@ -350,31 +357,31 @@ export const deleteNote = async (id: string) => {
 };
 
 // Optional: Delete all notes in a notebook (useful when deleting a notebook)
-export const deleteNotesByNotebookId = async (notebookId: string) => {
-  try {
-    // Validate notebookId format
-    if (!ObjectId.isValid(notebookId)) {
-      return {
-        success: false,
-        message: "Invalid notebook ID format",
-      };
-    }
+// export const deleteNotesByNotebookId = async (notebookId: string) => {
+//   try {
+//     // Validate notebookId format
+//     if (!ObjectId.isValid(notebookId)) {
+//       return {
+//         success: false,
+//         message: "Invalid notebook ID format",
+//       };
+//     }
 
-    const db = await connectDB();
-    const result = await db.collection("notes").deleteMany({
-      notebookId: new ObjectId(notebookId),
-    });
+//     const db = await connectDB();
+//     const result = await db.collection("notes").deleteMany({
+//       notebookId: new ObjectId(notebookId),
+//     });
 
-    return {
-      success: true,
-      message: `${result.deletedCount} notes deleted successfully`,
-      deletedCount: result.deletedCount,
-    };
-  } catch (err) {
-    const e = err as Error;
-    return {
-      success: false,
-      message: e.message || "Error deleting notes",
-    };
-  }
-};
+//     return {
+//       success: true,
+//       message: `${result.deletedCount} notes deleted successfully`,
+//       deletedCount: result.deletedCount,
+//     };
+//   } catch (err) {
+//     const e = err as Error;
+//     return {
+//       success: false,
+//       message: e.message || "Error deleting notes",
+//     };
+//   }
+// };
