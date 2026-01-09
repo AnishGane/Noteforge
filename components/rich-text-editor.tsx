@@ -7,9 +7,8 @@ import {
   type JSONContent,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
+import { useEffect, useRef, useState } from "react";
+import { updateNote } from "@/server/note";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,119 +36,111 @@ import {
   Superscript,
   Subscript,
 } from "lucide-react";
-import { updateNote } from "@/server/note";
 
 interface RichTextEditorProps {
-  content?: JSONContent[];
+  content?: JSONContent;
   noteId?: string;
 }
 
+const SAVE_DELAY = 500;
+
+const isEqualJSON = (a: unknown, b: unknown) =>
+  JSON.stringify(a) === JSON.stringify(b);
+
 const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(true);
+
+  const lastSavedRef = useRef<JSONContent | null>(content ?? null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const hasMounted = useRef(false);
+  
+
+
   const editor = useEditor({
-    extensions: [StarterKit, Document, Paragraph, Text],
-    immediatelyRender: false,
+    extensions: [StarterKit],
     autofocus: true,
     editable: true,
     injectCSS: false,
-    onUpdate: ({ editor }) => {
-      if (noteId) {
-        const content = editor.getJSON();
-        updateNote(noteId, { content });
-      }
-    },
+    immediatelyRender: false,
+
     content: content ?? {
       type: "doc",
       content: [
         {
-          type: "heading",
-          attrs: { level: 1 },
-          content: [{ type: "text", text: "Getting started" }],
-        },
-        {
           type: "paragraph",
-          content: [
-            { type: "text", text: "Welcome to the " },
-            {
-              type: "text",
-              text: "Simple Editor",
-              marks: [{ type: "italic" }],
-            },
-            { type: "text", text: " template! This template integrates " },
-            { type: "text", text: "open source", marks: [{ type: "bold" }] },
-            {
-              type: "text",
-              text: " UI components and Tiptap extensions licensed under ",
-            },
-            { type: "text", text: "MIT", marks: [{ type: "bold" }] },
-            { type: "text", text: "." },
-          ],
-        },
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", text: "Integrate it by following the " },
-            {
-              type: "text",
-              text: "Tiptap UI Components docs",
-              marks: [{ type: "code" }],
-            },
-            { type: "text", text: " or using our CLI tool." },
-          ],
-        },
-        {
-          type: "codeBlock",
-          content: [{ type: "text", text: "npx @tiptap/cli init" }],
-        },
-        {
-          type: "heading",
-          attrs: { level: 2 },
-          content: [{ type: "text", text: "Features" }],
-        },
-        {
-          type: "blockquote",
-          content: [
-            {
-              type: "paragraph",
-              content: [
-                {
-                  type: "text",
-                  text: "A fully responsive rich text editor with built-in support for common formatting and layout tools. Type markdown ",
-                },
-                { type: "text", text: "**", marks: [{ type: "bold" }] },
-                { type: "text", text: " or use keyboard shortcuts " },
-                { type: "text", text: "⌘+B", marks: [{ type: "code" }] },
-                { type: "text", text: " for most all common markdown marks." },
-              ],
-            },
-          ],
+          content: [{ type: "text", text: "Start writing..." }],
         },
       ],
     },
+
+    onUpdate: ({ editor }) => {
+      if (!noteId || !hasMounted.current) return;
+
+      const newContent = editor.getJSON();
+
+      // ❌ Prevent unnecessary updates
+      if (isEqualJSON(newContent, lastSavedRef.current)) return;
+
+      setSaved(false);
+      setIsSaving(true);
+
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+
+      debounceRef.current = setTimeout(async () => {
+        try {
+          await updateNote(noteId, { content: newContent });
+          lastSavedRef.current = newContent;
+          setSaved(true);
+        } finally {
+          setIsSaving(false);
+        }
+      }, SAVE_DELAY);
+    },
   });
+
+  useEffect(() => {
+    hasMounted.current = true;
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  const hasLoadedContent = useRef(false);
+
+  useEffect(() => {
+    if (!editor) return;
+    if (!content) return;
+    if (hasLoadedContent.current) return;
+  
+    editor.commands.setContent(content);
+    lastSavedRef.current = content;
+    setSaved(true);
+  
+    hasLoadedContent.current = true;
+  }, [editor, content]);
+  
 
   const editorState = useEditorState({
     editor,
     selector: (ctx) => {
       if (!ctx.editor) return {};
       return {
-        isBold: ctx.editor?.isActive("bold"),
-        canBold: ctx.editor?.can().chain().focus().toggleBold().run(),
-        isItalic: ctx.editor?.isActive("italic"),
-        canItalic: ctx.editor?.can().chain().focus().toggleItalic().run(),
-        isStrike: ctx.editor?.isActive("strike"),
-        canStrike: ctx.editor?.can().chain().focus().toggleStrike().run(),
-        isCode: ctx.editor?.isActive("code"),
-        canCode: ctx.editor?.can().chain().focus().toggleCode().run(),
-        isParagraph: ctx.editor?.isActive("paragraph"),
-        isHeading1: ctx.editor?.isActive("heading", { level: 1 }),
-        isHeading2: ctx.editor?.isActive("heading", { level: 2 }),
-        isHeading3: ctx.editor?.isActive("heading", { level: 3 }),
-        isBulletList: ctx.editor?.isActive("bulletList"),
-        isOrderedList: ctx.editor?.isActive("orderedList"),
-        isCodeBlock: ctx.editor?.isActive("codeBlock"),
-        isBlockquote: ctx.editor?.isActive("blockquote"),
-        canUndo: ctx.editor?.can().chain().focus().undo().run(),
-        canRedo: ctx.editor?.can().chain().focus().redo().run(),
+        isBold: ctx.editor.isActive("bold"),
+        canBold: ctx.editor.can().chain().focus().toggleBold().run(),
+        isItalic: ctx.editor.isActive("italic"),
+        canItalic: ctx.editor.can().chain().focus().toggleItalic().run(),
+        isStrike: ctx.editor.isActive("strike"),
+        canStrike: ctx.editor.can().chain().focus().toggleStrike().run(),
+        isCode: ctx.editor.isActive("code"),
+        canCode: ctx.editor.can().chain().focus().toggleCode().run(),
+        isHeading1: ctx.editor.isActive("heading", { level: 1 }),
+        isHeading2: ctx.editor.isActive("heading", { level: 2 }),
+        isHeading3: ctx.editor.isActive("heading", { level: 3 }),
+        isBulletList: ctx.editor.isActive("bulletList"),
+        isOrderedList: ctx.editor.isActive("orderedList"),
+        canUndo: ctx.editor.can().chain().focus().undo().run(),
+        canRedo: ctx.editor.can().chain().focus().redo().run(),
       };
     },
   });
@@ -162,8 +153,16 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   };
 
   return (
-    <div className="w-full max-w-full bg-card text-card-foreground rounded-lg overflow-hidden border">
-      {/* Toolbar */}
+    <div className="relative w-full max-w-full bg-card rounded-lg border overflow-hidden">
+      {/* Saving Indicator */}
+      <div className="absolute top-2 right-3 text-xs text-muted-foreground">
+        {isSaving && "Saving…"}
+        {!isSaving && !saved && "Unsaved changes"}
+        {!isSaving && saved && "Saved"}
+      </div>
+
+      {/* Toolbar (unchanged) */}
+      {/* ... YOUR TOOLBAR CODE STAYS EXACTLY THE SAME ... */}
       <div className="flex items-center gap-1 p-2 bg-muted/50 border-b">
         {/* Undo/Redo */}
         <Button
@@ -383,21 +382,21 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         <div className="flex-1" />
 
         {/* Add Button */}
-        <Button
+        {/* <Button
           variant="ghost"
           size="sm"
           className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-accent gap-1"
         >
           <Plus className="h-4 w-4" />
           Add
-        </Button>
+        </Button> */}
       </div>
 
-      {/* Editor Content */}
+      {/* Editor */}
       <div className="min-h-96 p-6 bg-card">
         <EditorContent
           editor={editor}
-          className="prose prose-neutral dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded"
+          className="prose dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:min-h-96"
         />
       </div>
     </div>

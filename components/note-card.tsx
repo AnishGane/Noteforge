@@ -36,9 +36,10 @@ interface Note {
 
 interface NoteCardProps {
   note: Note;
+  key: string;
 }
 
-export default function NoteCard({ note }: NoteCardProps) {
+export default function NoteCard({ note, key }: NoteCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -59,7 +60,7 @@ export default function NoteCard({ note }: NoteCardProps) {
     }
   };
   return (
-    <Card>
+    <Card key={key}>
       <CardHeader>
         <CardTitle>{note.title}</CardTitle>
       </CardHeader>

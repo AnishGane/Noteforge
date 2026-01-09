@@ -1,6 +1,7 @@
 import PageWrapper from "@/components/page-wrapper";
 import RichTextEditor from "@/components/rich-text-editor";
 import { getNoteById } from "@/server/note";
+import { JSONContent } from "@tiptap/react";
 
 type Params = {
   noteId: string;
@@ -9,6 +10,7 @@ type Params = {
 async function NotePage({ params }: { params: Params }) {
   const { noteId } = await params;
   const note = await getNoteById(noteId);
+  console.log(note);
   return (
     <PageWrapper
       breadCrumbs={[
@@ -24,7 +26,10 @@ async function NotePage({ params }: { params: Params }) {
       ]}
     >
       <h1>{note?.data?.title}</h1>
-      <RichTextEditor content={note?.data?.note?.content} noteId={noteId} />
+      <RichTextEditor
+        content={note?.data?.content as JSONContent}
+        noteId={noteId}
+      />
     </PageWrapper>
     // <h1>Hello</h1>
   );

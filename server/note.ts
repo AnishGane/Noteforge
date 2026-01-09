@@ -210,7 +210,7 @@ export const updateNote = async (
   id: string,
   updates: {
     title?: string;
-    content?: any;
+    content?: JSONContent;
   }
 ) => {
   try {

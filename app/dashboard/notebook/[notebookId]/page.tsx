@@ -1,3 +1,4 @@
+import { CreateNoteButton } from "@/components/create-note-button";
 import NoteCard from "@/components/note-card";
 import PageWrapper from "@/components/page-wrapper";
 import { getNoteBookById } from "@/server/notebook";
@@ -9,7 +10,6 @@ type Params = {
 async function NotebookPage({ params }: { params: Params }) {
   const { notebookId } = await params;
   const notebook = await getNoteBookById(notebookId);
-  console.log(notebook);
   return (
     <PageWrapper
       breadCrumbs={[
@@ -22,12 +22,14 @@ async function NotebookPage({ params }: { params: Params }) {
     >
       <h1>{notebook?.data?.name}</h1>
 
+      <CreateNoteButton notebookId={notebookId} />
+
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {notebook?.data?.notes.map((note) => (
           <NoteCard
-            key={note.id}
+            key={note._id}
             note={{
-              id: note.id,
+              id: note._id.toString(),
               title: note.title,
               content: note.content,
               notebookId: notebookId,
