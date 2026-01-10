@@ -30,6 +30,7 @@ interface Notebook {
   id: string;
   name: string;
   notesCount: number;
+  createdAt: string;
 }
 
 interface NoteBookCardProps {
@@ -59,14 +60,26 @@ export default function NoteBookCard({ notebook }: NoteBookCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{notebook.name}</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>{notebook.name}</CardTitle>
+          <p className="text-muted-foreground text-xs">
+            {new Date(notebook.createdAt).toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit", // only hours and minutes
+              hour12: true, // shows AM/PM
+            })}
+          </p>
+        </div>
       </CardHeader>
 
       <CardContent>
-        <p>{notebook.notesCount} notes</p>
+        <p className="text-sm">Notes: {notebook.notesCount}</p>
       </CardContent>
 
-      <CardFooter className="flex gap-6">
+      <CardFooter className="flex gap-4">
         <Link href={`/dashboard/notebook/${notebook.id}`} className="w-full">
           <Button variant="outline" className=" cursor-pointer w-full">
             View Notebook

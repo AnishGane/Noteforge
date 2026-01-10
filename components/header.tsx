@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
-import { Logo } from "@/components/logo";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { useScroll } from "motion/react";
-import { ModeToggle } from "./mode-toggle";
 import Image from "next/image";
+import { ModeSwitcher } from "./mode-switcher";
 
 const menuItems = [
   { name: "Features", href: "#link" },
@@ -49,10 +48,10 @@ export const HeroHeader = () => {
                 <Image
                   src="/Logo.png"
                   alt="Brand Logo"
-                  width={40}
-                  height={40}
+                  width={35}
+                  height={35}
                 />
-                <span className="text-2xl font-medium">NoteForge</span>
+                <span className="text-xl tracking-wide">NoteForge</span>
               </Link>
 
               <button
@@ -67,10 +66,10 @@ export const HeroHeader = () => {
 
             <div className="bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <ModeToggle />
+                <ModeSwitcher />
                 <Button asChild variant="outline" size="sm">
                   <Link href="/login">
-                    <span>Login</span>
+                    <span className="font-medium tracking-wide">Login</span>
                   </Link>
                 </Button>
                 <Button asChild size="sm">

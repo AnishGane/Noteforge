@@ -74,7 +74,7 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max">Create Note</Button>
+        <Button  className="w-max cursor-pointer">Create Note</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

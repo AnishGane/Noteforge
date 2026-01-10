@@ -8,7 +8,7 @@ export default function Features() {
       <div className="@container mx-auto max-w-5xl px-6">
         <div className="text-center">
           <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-            Crafted for the Developers Like You
+            Crafted for Developers Like You
           </h2>
           <p className="mt-4">
             Smart, flexible, and powerful — everything you need to build your
@@ -22,13 +22,13 @@ export default function Features() {
                 <Zap className="size-6" aria-hidden />
               </CardDecorator>
 
-              <h3 className="mt-6 font-medium">Customizable</h3>
+              <h3 className="mt-6 font-medium">Quick Notes</h3>
             </CardHeader>
 
             <CardContent>
               <p className="text-sm">
-                Extensive customization options, allowing you to tailor every
-                aspect to meet your specific needs.
+                Capture ideas instantly with lightning-fast input and
+                keyboard-first UX. No friction — just flow.
               </p>
             </CardContent>
           </Card>
@@ -39,13 +39,13 @@ export default function Features() {
                 <Settings2 className="size-6" aria-hidden />
               </CardDecorator>
 
-              <h3 className="mt-6 font-medium">You have full control</h3>
+              <h3 className="mt-6 font-medium">Developer Friendly</h3>
             </CardHeader>
 
             <CardContent>
               <p className="mt-3 text-sm">
-                From design elements to functionality, you have complete control
-                to create a unique and personalized experience.
+                Markdown, code blocks, CLI shortcuts, and Git-style versioning.
+                Feels like home.
               </p>
             </CardContent>
           </Card>
@@ -56,13 +56,13 @@ export default function Features() {
                 <Sparkles className="size-6" aria-hidden />
               </CardDecorator>
 
-              <h3 className="mt-6 font-medium">Powered By AI</h3>
+              <h3 className="mt-6 font-medium">Secure by Design</h3>
             </CardHeader>
 
             <CardContent>
               <p className="mt-3 text-sm">
-                Elements to functionality, you have complete control to create a
-                unique experience.
+                Your notes are private. Local-first architecture and optional
+                end-to-end encryption mean full control.
               </p>
             </CardContent>
           </Card>

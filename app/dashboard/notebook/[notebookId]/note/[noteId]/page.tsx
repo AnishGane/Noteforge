@@ -31,7 +31,6 @@ async function NotePage({ params }: { params: Params }) {
         noteId={noteId}
       />
     </PageWrapper>
-    // <h1>Hello</h1>
   );
 }
 

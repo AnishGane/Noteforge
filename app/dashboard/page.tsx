@@ -1,11 +1,19 @@
 import { CreateNoteBookButton } from "@/components/create-notebook-button";
 import NoteBookCard from "@/components/notebook-card";
 import PageWrapper from "@/components/page-wrapper";
+import { auth } from "@/lib/auth";
 import { getNoteBooks } from "@/server/notebook";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const notebooks = await getNoteBooks();
-  // console.log(notebooks);
+  console.log(notebooks);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session) return redirect("/");
+
   return (
     <PageWrapper breadCrumbs={[{ label: "Dashboard", path: "/dashboard" }]}>
       <h1>Notebook</h1>
@@ -21,6 +29,7 @@ export default async function Page() {
                 id: notebook._id.toString(),
                 name: notebook.name,
                 notesCount: notebook.notesCount,
+                createdAt: notebook.createdAt,
               }}
             />
           ))}

@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "./ui/sidebar";
 import LogoutPage from "@/app/logout/page";
-import { ModeToggle } from "./mode-toggle";
 import { Fragment } from "react/jsx-runtime";
+import { ModeSwitcher } from "./mode-switcher";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -47,7 +47,7 @@ export default function PageWrapper({
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-3">
-            <ModeToggle />
+            <ModeSwitcher />
             <LogoutPage />
           </div>
         </div>

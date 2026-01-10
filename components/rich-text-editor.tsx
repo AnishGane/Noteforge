@@ -155,7 +155,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   return (
     <div className="relative w-full max-w-full bg-card rounded-lg border overflow-hidden">
       {/* Saving Indicator */}
-      <div className="absolute top-2 right-3 text-xs text-muted-foreground">
+      <div className="absolute top-4 right-3 text-xs text-muted-foreground">
         {isSaving && "Saving…"}
         {!isSaving && !saved && "Unsaved changes"}
         {!isSaving && saved && "Saved"}
