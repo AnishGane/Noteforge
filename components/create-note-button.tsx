@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createNote } from "@/server/note";
 
@@ -74,7 +74,10 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button  className="w-max cursor-pointer">Create Note</Button>
+        <Button className="w-max cursor-pointer">
+          <PlusIcon className="size-4" />
+          Create Note
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

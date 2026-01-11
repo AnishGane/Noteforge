@@ -5,12 +5,13 @@ import { JSONContent } from "@tiptap/react";
 
 type Params = {
   noteId: string;
+  notebookId: string;
 };
 
 async function NotePage({ params }: { params: Params }) {
-  const { noteId } = await params;
+  const { noteId, notebookId } = await params;
+  
   const note = await getNoteById(noteId);
-  console.log(note);
   return (
     <PageWrapper
       breadCrumbs={[
@@ -21,7 +22,7 @@ async function NotePage({ params }: { params: Params }) {
         },
         {
           label: note?.data?.title ?? "Note",
-          path: `/dashboard/note/${noteId}`,
+          path: `/dashboard/notebook/${notebookId}/note/${noteId}`,
         },
       ]}
     >

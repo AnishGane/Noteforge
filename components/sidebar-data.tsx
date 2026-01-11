@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/sidebar";
 import { ChevronRight, FileIcon, FolderIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
 
 interface SidebarDataProps {
   data: {
@@ -34,7 +34,7 @@ interface SidebarDataProps {
 export default function SidebarData({ data }: SidebarDataProps) {
   const [search] = useQueryState("search", { defaultValue: "" });
   const query = search.toLowerCase();
-  const [active, setActive] = useState<number | null>(null);
+  const pathname = usePathname();
 
   const filteredData = data.navMain
     .map((notebook) => {
@@ -82,12 +82,11 @@ export default function SidebarData({ data }: SidebarDataProps) {
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {item?.items.map((note, idx) => (
+                  {item?.items.map((note) => (
                     <SidebarMenuItem key={note.url}>
                       <SidebarMenuButton
                         asChild
-                        isActive={idx === active ? true : false}
-                        onClick={() => setActive(idx)}
+                        isActive={pathname === note.url}
                       >
                         <Link
                           href={note.url}

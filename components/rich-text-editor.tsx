@@ -54,8 +54,6 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   const lastSavedRef = useRef<JSONContent | null>(content ?? null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const hasMounted = useRef(false);
-  
-
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -79,7 +77,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
 
       const newContent = editor.getJSON();
 
-      // ❌ Prevent unnecessary updates
+      // Prevent unnecessary updates
       if (isEqualJSON(newContent, lastSavedRef.current)) return;
 
       setSaved(false);
@@ -112,14 +110,13 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
     if (!editor) return;
     if (!content) return;
     if (hasLoadedContent.current) return;
-  
+
     editor.commands.setContent(content);
     lastSavedRef.current = content;
     setSaved(true);
-  
+
     hasLoadedContent.current = true;
   }, [editor, content]);
-  
 
   const editorState = useEditorState({
     editor,
@@ -380,16 +377,6 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
 
         {/* Spacer */}
         <div className="flex-1" />
-
-        {/* Add Button */}
-        {/* <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-accent gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          Add
-        </Button> */}
       </div>
 
       {/* Editor */}

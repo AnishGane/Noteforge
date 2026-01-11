@@ -16,11 +16,10 @@ async function NotebookPage({ params }: { params: Params }) {
         { label: "Dashboard", path: "/dashboard" },
         {
           label: notebook?.data?.name ?? "NoteBook",
-          path: `/dashboard/note/${notebook}`,
+          path: `/dashboard/notebook/${notebookId}`,
         },
       ]}
     >
-      <h1>{notebook?.data?.name}</h1>
 
       <CreateNoteButton notebookId={notebookId} />
       <div className="w-full">

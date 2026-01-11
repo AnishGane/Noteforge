@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import {  Outfit } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-
 
 const outfit = Outfit({
   subsets: ["latin"],
