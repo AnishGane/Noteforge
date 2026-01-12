@@ -2,19 +2,23 @@
 
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
-import { NoteDB } from "@/types";
+import { NoteDB, NotebookDB } from "@/types";
 import { JSONContent } from "@tiptap/react";
 import { ObjectId } from "mongodb";
 import { headers } from "next/headers";
 
-interface CreateNotePaylod{
+interface CreateNotePaylod {
   title: string;
   content: JSONContent;
   notebookId: string;
 }
 
 // Create a new note
-export const createNote = async ({notebookId, title, content}: CreateNotePaylod) => {
+export const createNote = async ({
+  notebookId,
+  title,
+  content,
+}: CreateNotePaylod) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -39,7 +43,7 @@ export const createNote = async ({notebookId, title, content}: CreateNotePaylod)
     const db = await connectDB();
 
     // Verify the notebook exists and belongs to the user
-    const notebook = await db.collection("notebooks").findOne({
+    const notebook = await db.collection<NotebookDB>("notebooks").findOne({
       _id: new ObjectId(notebookId),
       userId,
     });
@@ -51,7 +55,7 @@ export const createNote = async ({notebookId, title, content}: CreateNotePaylod)
       };
     }
 
-    const newNote = await db.collection("notes").insertOne({
+    const newNote = await db.collection<NoteDB>("notes").insertOne({
       notebookId: new ObjectId(notebookId),
       title: title || "Untitled",
       content: {
@@ -75,68 +79,6 @@ export const createNote = async ({notebookId, title, content}: CreateNotePaylod)
     };
   }
 };
-
-// Get all notes for a specific notebook
-// export const getNotesByNotebookId = async (notebookId: string) => {
-//   try {
-//     const session = await auth.api.getSession({
-//       headers: await headers(),
-//     });
-
-//     const userId = session?.user?.id;
-//     if (!userId) {
-//       return {
-//         success: false,
-//         message: "Please login to view notes",
-//         data: [],
-//       };
-//     }
-
-//     // Validate notebookId format
-//     if (!ObjectId.isValid(notebookId)) {
-//       return {
-//         success: false,
-//         message: "Invalid notebook ID format",
-//         data: [],
-//       };
-//     }
-
-//     const db = await connectDB();
-
-//     // Verify the notebook belongs to the user
-//     const notebook = await db.collection("notebooks").findOne({
-//       _id: new ObjectId(notebookId),
-//       userId,
-//     });
-
-//     if (!notebook) {
-//       return {
-//         success: false,
-//         message: "Notebook not found or you don't have permission",
-//         data: [],
-//       };
-//     }
-
-//     const notes = await db
-//       .collection("notes")
-//       .find({ notebookId: new ObjectId(notebookId) })
-//       .sort({ updatedAt: -1 })
-//       .toArray();
-
-//     return {
-//       success: true,
-//       message: "Notes fetched successfully",
-//       data: notes,
-//     };
-//   } catch (err) {
-//     const e = err as Error;
-//     return {
-//       success: false,
-//       message: e.message || "Error fetching notes",
-//       data: [],
-//     };
-//   }
-// };
 
 // Get a single note by ID
 export const getNoteById = async (id: string) => {
@@ -177,7 +119,7 @@ export const getNoteById = async (id: string) => {
     }
 
     // Verify the note's notebook belongs to the user
-    const notebook = await db.collection("notebooks").findOne({
+    const notebook = await db.collection<NotebookDB>("notebooks").findOne({
       _id: note.notebookId,
       userId,
     });
@@ -193,7 +135,7 @@ export const getNoteById = async (id: string) => {
     return {
       success: true,
       message: "Note fetched successfully",
-      data: {...note, notebookName: notebook.name},
+      data: { ...note, notebookName: notebook.name },
     };
   } catch (err) {
     const e = err as Error;
@@ -237,7 +179,7 @@ export const updateNote = async (
     const db = await connectDB();
 
     // Get the note
-    const note = await db.collection("notes").findOne({
+    const note = await db.collection<NoteDB>("notes").findOne({
       _id: new ObjectId(id),
     });
 
@@ -249,7 +191,7 @@ export const updateNote = async (
     }
 
     // Verify the note's notebook belongs to the user
-    const notebook = await db.collection("notebooks").findOne({
+    const notebook = await db.collection<NotebookDB>("notebooks").findOne({
       _id: note.notebookId,
       userId,
     });
@@ -275,7 +217,7 @@ export const updateNote = async (
     }
 
     await db
-      .collection("notes")
+      .collection<NoteDB>("notes")
       .updateOne({ _id: new ObjectId(id) }, { $set: updateData });
 
     return {
@@ -317,7 +259,7 @@ export const deleteNote = async (id: string) => {
     const db = await connectDB();
 
     // Get the note
-    const note = await db.collection("notes").findOne({
+    const note = await db.collection<NoteDB>("notes").findOne({
       _id: new ObjectId(id),
     });
 
@@ -329,7 +271,7 @@ export const deleteNote = async (id: string) => {
     }
 
     // Verify the note's notebook belongs to the user
-    const notebook = await db.collection("notebooks").findOne({
+    const notebook = await db.collection<NotebookDB>("notebooks").findOne({
       _id: note.notebookId,
       userId,
     });
@@ -341,7 +283,7 @@ export const deleteNote = async (id: string) => {
       };
     }
 
-    await db.collection("notes").deleteOne({ _id: new ObjectId(id) });
+    await db.collection<NoteDB>("notes").deleteOne({ _id: new ObjectId(id) });
 
     return {
       success: true,
@@ -355,33 +297,3 @@ export const deleteNote = async (id: string) => {
     };
   }
 };
-
-// Optional: Delete all notes in a notebook (useful when deleting a notebook)
-// export const deleteNotesByNotebookId = async (notebookId: string) => {
-//   try {
-//     // Validate notebookId format
-//     if (!ObjectId.isValid(notebookId)) {
-//       return {
-//         success: false,
-//         message: "Invalid notebook ID format",
-//       };
-//     }
-
-//     const db = await connectDB();
-//     const result = await db.collection("notes").deleteMany({
-//       notebookId: new ObjectId(notebookId),
-//     });
-
-//     return {
-//       success: true,
-//       message: `${result.deletedCount} notes deleted successfully`,
-//       deletedCount: result.deletedCount,
-//     };
-//   } catch (err) {
-//     const e = err as Error;
-//     return {
-//       success: false,
-//       message: e.message || "Error deleting notes",
-//     };
-//   }
-// };

@@ -2,6 +2,7 @@ import { CreateNoteButton } from "@/components/create-note-button";
 import NoteCard from "@/components/note-card";
 import PageWrapper from "@/components/page-wrapper";
 import { getNoteBookById } from "@/server/notebook";
+import { JSONContent } from "@tiptap/react";
 
 type Params = {
   notebookId: string;
@@ -10,6 +11,7 @@ type Params = {
 async function NotebookPage({ params }: { params: Params }) {
   const { notebookId } = await params;
   const notebook = await getNoteBookById(notebookId);
+  console.log(notebook);
   return (
     <PageWrapper
       breadCrumbs={[
@@ -20,34 +22,32 @@ async function NotebookPage({ params }: { params: Params }) {
         },
       ]}
     >
-
       <CreateNoteButton notebookId={notebookId} />
       <div className="w-full">
-        {notebook?.data?.notes?.length > 0 ? (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-            {notebook?.data?.notes ? (
-              notebook?.data?.notes.map((note) => (
-                <NoteCard
-                  key={note._id.toString()}
-                  note={{
-                    id: note._id.toString(),
-                    title: note.title,
-                    content: note.content,
-                    notebookId: notebookId,
-                  }}
-                />
-              ))
-            ) : null}
-            </div>
-        ): (
+        {notebook?.data?.notes?.length! > 0 ? (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+            {notebook?.data?.notes
+              ? notebook?.data?.notes.map((note) => (
+                  <NoteCard
+                    key={note._id.toString()}
+                    note={{
+                      id: note._id.toString(),
+                      title: note.title,
+                      content: note.content,
+                      notebookId: notebookId,
+                    }}
+                  />
+                ))
+              : null}
+          </div>
+        ) : (
           <div className=" mx-auto w-full mt-6">
             <p className="text-muted-foreground text-center text-sm">
               Add some notes to see here
             </p>
           </div>
-          
         )}
-        </div>
+      </div>
     </PageWrapper>
   );
 }

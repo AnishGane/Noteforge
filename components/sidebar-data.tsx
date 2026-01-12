@@ -17,6 +17,7 @@ import { ChevronRight, FileIcon, FolderIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
+import { useState } from "react";
 
 interface SidebarDataProps {
   data: {
@@ -32,6 +33,7 @@ interface SidebarDataProps {
 }
 
 export default function SidebarData({ data }: SidebarDataProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [search] = useQueryState("search", { defaultValue: "" });
   const query = search.toLowerCase();
   const pathname = usePathname();
@@ -60,7 +62,8 @@ export default function SidebarData({ data }: SidebarDataProps) {
       {filteredData.map((item) => (
         <Collapsible
           key={item?.title}
-          defaultOpen
+          open={isOpen}
+          onOpenChange={setIsOpen}
           className="group/collapsible"
         >
           <SidebarGroup>
@@ -73,7 +76,7 @@ export default function SidebarData({ data }: SidebarDataProps) {
                   <FolderIcon className="h-4 w-4" />
                   {item?.title}
                 </div>
-                {item?.items?.length > 0 && (
+                {item?.items?.length! > 0 && (
                   <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                 )}
               </CollapsibleTrigger>

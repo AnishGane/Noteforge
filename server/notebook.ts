@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
-import { NoteDB, NotebookDB } from "@/types";
+import { NoteDB, NotebookDB, NotebookResponse } from "@/types";
 import { ObjectId } from "mongodb";
 import { headers } from "next/headers";
 
@@ -106,9 +106,10 @@ export const getNoteBooks = async () => {
   }
 };
 
-export const getNoteBookById = async (id: string) => {
+export const getNoteBookById = async (
+  id: string
+): Promise<NotebookResponse> => {
   try {
-    // Validate ObjectId format
     if (!ObjectId.isValid(id)) {
       return {
         success: false,
@@ -132,10 +133,9 @@ export const getNoteBookById = async (id: string) => {
 
     const db = await connectDB();
 
-    // Get the notebook
     const notebook = await db.collection("notebooks").findOne({
       _id: new ObjectId(id),
-      userId, // Ensure user owns this notebook
+      userId,
     });
 
     if (!notebook) {
@@ -146,7 +146,6 @@ export const getNoteBookById = async (id: string) => {
       };
     }
 
-    // Get all notes for this notebook
     const notes = await db
       .collection("notes")
       .find({ notebookId: new ObjectId(id) })
@@ -157,8 +156,19 @@ export const getNoteBookById = async (id: string) => {
       success: true,
       message: "Notebook fetched successfully",
       data: {
-        ...notebook,
-        notes,
+        _id: notebook._id.toString(),
+        name: notebook.name,
+        userId: notebook.userId,
+        createdAt: notebook.createdAt,
+        updatedAt: notebook.updatedAt,
+        notes: notes.map((note) => ({
+          _id: note._id.toString(),
+          notebookId: note.notebookId.toString(),
+          title: note.title,
+          content: note.content,
+          createdAt: note.createdAt,
+          updatedAt: note.updatedAt,
+        })),
       },
     };
   } catch (err) {

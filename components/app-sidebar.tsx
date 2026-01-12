@@ -5,18 +5,36 @@ import { SearchForm } from "@/components/search-form";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { getNoteBooks } from "@/server/notebook";
 import Image from "next/image";
 import SidebarData from "./sidebar-data";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { ChevronUp, User2 } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const notebooks = await getNoteBooks();
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const username = session?.user?.name;
 
   const data = {
     navMain:
@@ -39,6 +57,7 @@ export async function AppSidebar({
           })
         : [],
   };
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -59,6 +78,32 @@ export async function AppSidebar({
       <SidebarContent className="gap-0 mt-2">
         <SidebarData data={data} />
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  {username || "User"}
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem>
+                  <User2 />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

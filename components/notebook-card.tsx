@@ -30,7 +30,7 @@ interface Notebook {
   id: string;
   name: string;
   notesCount: number;
-  createdAt: string;
+  createdAt: Date;
 }
 
 interface NoteBookCardProps {
