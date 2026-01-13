@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ChevronRight, FileIcon, FolderIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 
@@ -33,7 +33,8 @@ interface SidebarDataProps {
 }
 
 export default function SidebarData({ data }: SidebarDataProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [openNotebook, setOpenNotebook] = useState<string | null>(null);
+
   const [search] = useQueryState("search", { defaultValue: "" });
   const query = search.toLowerCase();
   const pathname = usePathname();
@@ -56,14 +57,15 @@ export default function SidebarData({ data }: SidebarDataProps) {
       };
     })
     .filter(Boolean);
+  const router = useRouter();
 
   return (
     <>
       {filteredData.map((item) => (
         <Collapsible
           key={item?.title}
-          open={isOpen}
-          onOpenChange={setIsOpen}
+          open={openNotebook === item!.title}
+          onOpenChange={(open) => setOpenNotebook(open ? item!.title : null)}
           className="group/collapsible"
         >
           <SidebarGroup>
@@ -72,7 +74,12 @@ export default function SidebarData({ data }: SidebarDataProps) {
               className="group/label cursor-pointer text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm"
             >
               <CollapsibleTrigger>
-                <div className="flex gap-2 items-center">
+                <div
+                  className="flex gap-2 items-center"
+                  onClick={() => {
+                    router.push(item!.url);
+                  }}
+                >
                   <FolderIcon className="h-4 w-4" />
                   {item?.title}
                 </div>

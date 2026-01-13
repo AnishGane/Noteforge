@@ -5,6 +5,7 @@ import React from "react";
 
 async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
+  console.log(cookieStore);
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
   return (

@@ -11,7 +11,6 @@ type Params = {
 async function NotebookPage({ params }: { params: Params }) {
   const { notebookId } = await params;
   const notebook = await getNoteBookById(notebookId);
-  console.log(notebook);
   return (
     <PageWrapper
       breadCrumbs={[
@@ -25,7 +24,7 @@ async function NotebookPage({ params }: { params: Params }) {
       <CreateNoteButton notebookId={notebookId} />
       <div className="w-full">
         {notebook?.data?.notes?.length! > 0 ? (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
             {notebook?.data?.notes
               ? notebook?.data?.notes.map((note) => (
                   <NoteCard

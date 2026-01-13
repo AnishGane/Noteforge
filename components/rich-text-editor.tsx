@@ -7,6 +7,9 @@ import {
   type JSONContent,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
 import { useEffect, useRef, useState } from "react";
 import { updateNote } from "@/server/note";
 import { Button } from "@/components/ui/button";
@@ -54,23 +57,47 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   const lastSavedRef = useRef<JSONContent | null>(content ?? null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const hasMounted = useRef(false);
+  const boilerplateContent: JSONContent = {
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Welcome to your note! You can start writing here...",
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "This editor supports headings, lists, formatting, and more.",
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: "Use the toolbar above to format your text and organize your notes.",
+          },
+        ],
+      },
+    ],
+  };
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, Document, Paragraph, Text],
     autofocus: true,
     editable: true,
     injectCSS: false,
     immediatelyRender: false,
 
-    content: content ?? {
-      type: "doc",
-      content: [
-        {
-          type: "paragraph",
-          content: [{ type: "text", text: "Start writing..." }],
-        },
-      ],
-    },
+    content: content ?? boilerplateContent,
 
     onUpdate: ({ editor }) => {
       if (!noteId || !hasMounted.current) return;
@@ -108,11 +135,13 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
 
   useEffect(() => {
     if (!editor) return;
-    if (!content) return;
     if (hasLoadedContent.current) return;
 
-    editor.commands.setContent(content);
-    lastSavedRef.current = content;
+    // Use content if exists, otherwise boilerplate
+    const initialContent = content ?? boilerplateContent;
+
+    editor.commands.setContent(initialContent);
+    lastSavedRef.current = initialContent;
     setSaved(true);
 
     hasLoadedContent.current = true;
@@ -152,7 +181,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   return (
     <div className="relative w-full max-w-full bg-card rounded-lg border overflow-hidden">
       {/* Saving Indicator */}
-      <div className="absolute top-4 right-3 text-xs text-muted-foreground">
+      <div className="absolute bottom-4 right-3 text-xs text-muted-foreground">
         {isSaving && "Saving…"}
         {!isSaving && !saved && "Unsaved changes"}
         {!isSaving && saved && "Saved"}
@@ -160,7 +189,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
 
       {/* Toolbar (unchanged) */}
       {/* ... YOUR TOOLBAR CODE STAYS EXACTLY THE SAME ... */}
-      <div className="flex items-center gap-1 p-2 bg-muted/50 border-b">
+      <div className="flex flex-wrap items-center gap-1 p-2 bg-muted/50 border-b overflow-x-auto scrollbar-none">
         {/* Undo/Redo */}
         <Button
           variant="ghost"
@@ -181,7 +210,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           <Redo className="h-4 w-4" />
         </Button>
 
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="w-px h-6 bg-border mx-1 shrink-0" />
 
         {/* Heading Dropdown */}
         <DropdownMenu>
@@ -255,7 +284,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           <ListOrdered className="h-4 w-4" />
         </Button>
 
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="w-px h-6 bg-border mx-1 shrink-0" />
 
         {/* Text Formatting */}
         <Button
@@ -318,7 +347,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           <Underline className="h-4 w-4" />
         </Button>
 
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="w-px h-6 bg-border mx-1 shrink-0" />
 
         {/* Additional Tools */}
         <Button
@@ -343,7 +372,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           <Subscript className="h-4 w-4" />
         </Button>
 
-        <div className="w-px h-6 bg-border mx-1" />
+        <div className="w-px h-6 bg-border mx-1 shrink-0" />
 
         {/* Alignment */}
         <Button
@@ -380,10 +409,10 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
       </div>
 
       {/* Editor */}
-      <div className="min-h-96 p-6 bg-card">
+      <div className="min-h-96 p-2.5 md:p-6 bg-card w-full overflow-y-auto wrap-break-word">
         <EditorContent
           editor={editor}
-          className="prose dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:min-h-96"
+          className="prose dark:prose-invert max-w-full focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror]:wrap-break-word [&_.ProseMirror]:break-all"
         />
       </div>
     </div>

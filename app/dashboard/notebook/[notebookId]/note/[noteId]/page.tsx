@@ -10,7 +10,7 @@ type Params = {
 
 async function NotePage({ params }: { params: Params }) {
   const { noteId, notebookId } = await params;
-  
+
   const note = await getNoteById(noteId);
   return (
     <PageWrapper

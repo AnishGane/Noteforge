@@ -19,7 +19,7 @@ export default async function Page() {
     >
       <CreateNoteBookButton />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
         {notebooks.success &&
           notebooks.data.notebooks.map((notebook) => (
             <NoteBookCard
@@ -35,7 +35,11 @@ export default async function Page() {
       </div>
 
       {notebooks.success && notebooks.data.notebooks.length === 0 && (
-        <p>No notebooks found</p>
+        <div className="max-w-full mx-auto">
+          <p className="text-xs text-muted-foreground">
+            Create a Notebook to get started
+          </p>
+        </div>
       )}
 
       {!notebooks.success && (

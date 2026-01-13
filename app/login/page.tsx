@@ -10,7 +10,7 @@ export default function LoginPage() {
           className="flex items-center gap-2 text-xl self-center font-medium"
         >
           <Image
-            src="/logo.png"
+            src="/Logo.png"
             alt="logo"
             className="size-8"
             width={24}

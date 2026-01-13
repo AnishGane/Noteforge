@@ -22,7 +22,7 @@ interface PageWrapperProps {
     label: string;
     path: string;
   }[];
-  initials: string;
+  initials?: string;
 }
 
 export default function PageWrapper({
