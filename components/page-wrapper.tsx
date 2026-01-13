@@ -73,7 +73,10 @@ export default function PageWrapper({
 
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarImage
+                src="https://github.com/shadcn.png"
+                alt="@shadcn png"
+              />
               <AvatarFallback className="text-xs">{initials}</AvatarFallback>
             </Avatar>
             <ModeSwitcher />

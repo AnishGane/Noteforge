@@ -60,7 +60,7 @@ export default function NoteBookCard({ notebook }: NoteBookCardProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex lg:items-center flex-row  md:flex-col lg:flex-row justify-between">
+        <div className="flex lg:items-center flex-row gap-y-1 md:flex-col lg:flex-row justify-between">
           <CardTitle>{notebook.name}</CardTitle>
           <p className="text-muted-foreground text-[10px]">
             {new Date(notebook.createdAt).toLocaleString(undefined, {
