@@ -7,7 +7,6 @@ import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 
-
 export function ModeSwitcher() {
   const { setTheme, resolvedTheme } = useTheme();
 
@@ -18,7 +17,7 @@ export function ModeSwitcher() {
   return (
     <Button
       variant="ghost"
-      className="group/toggle h-8 w-8 px-0"
+      className="group/toggle h-8 p-0 w-full"
       onClick={toggleTheme}
     >
       <SunIcon className="hidden [html.dark_&]:block" />

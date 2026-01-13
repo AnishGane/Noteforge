@@ -15,6 +15,14 @@ import { ModeSwitcher } from "./mode-switcher";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -71,17 +79,30 @@ export default function PageWrapper({
             </Breadcrumb>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                alt="@shadcn png"
-              />
-              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-            </Avatar>
-            <ModeSwitcher />
+          {/* <div className="flex items-center gap-3">
+            
+            
             <LogoutPage />
-          </div>
+          </div> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn png"
+                />
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-4 mt-1">
+              <DropdownMenuItem>
+                <ModeSwitcher />
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <LogoutPage />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 

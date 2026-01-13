@@ -13,9 +13,8 @@ function LogoutPage() {
     window.location.replace("/");
   };
   return (
-    <Button variant={"outline"} onClick={handleLogout}>
-      <LogOutIcon className="size-4" />
-      Logout
+    <Button variant={"destructive"} onClick={handleLogout}>
+      <LogOutIcon className="size-4 text-white" />
     </Button>
   );
 }
