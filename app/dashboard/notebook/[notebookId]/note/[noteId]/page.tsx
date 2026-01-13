@@ -1,7 +1,9 @@
 import PageWrapper from "@/components/page-wrapper";
-import RichTextEditor from "@/components/rich-text-editor";
+// import RichTextEditor from "@/components/rich-text-editor";
 import { getNoteById } from "@/server/note";
 import { JSONContent } from "@tiptap/react";
+import dynamic from "next/dynamic";
+const RichTextEditor = dynamic(() => import("@/components/rich-text-editor"));
 
 type Params = {
   noteId: string;
