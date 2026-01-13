@@ -2,13 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { LogOutIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 function LogoutPage() {
-  const router = useRouter();
   const handleLogout = async () => {
     await authClient.signOut();
-    router.push("/");
+    window.location.replace ("/");
   };
   return (
     <Button variant={"outline"} onClick={handleLogout}>
