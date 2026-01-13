@@ -23,17 +23,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ChevronUp, User2 } from "lucide-react";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { getAuthSession } from "@/server/get-auth-session";
 
 export async function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const notebooks = await getNoteBooks();
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getAuthSession();
   const username = session?.user?.name;
 
   const data = {

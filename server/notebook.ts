@@ -1,16 +1,13 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import { NoteDB, NotebookDB, NotebookResponse } from "@/types";
 import { ObjectId } from "mongodb";
-import { headers } from "next/headers";
+import { getAuthSession } from "./get-auth-session";
 
 export const createNoteBook = async (name: string) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
     if (!userId) {
@@ -44,9 +41,7 @@ export const createNoteBook = async (name: string) => {
 
 export const getNoteBooks = async () => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
 
@@ -118,9 +113,7 @@ export const getNoteBookById = async (
       };
     }
 
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
     if (!userId) {

@@ -1,11 +1,10 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import { NoteDB, NotebookDB } from "@/types";
 import { JSONContent } from "@tiptap/react";
 import { ObjectId } from "mongodb";
-import { headers } from "next/headers";
+import { getAuthSession } from "./get-auth-session";
 
 interface CreateNotePaylod {
   title: string;
@@ -20,9 +19,7 @@ export const createNote = async ({
   content,
 }: CreateNotePaylod) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
     if (!userId) {
@@ -83,9 +80,7 @@ export const createNote = async ({
 // Get a single note by ID
 export const getNoteById = async (id: string) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
     if (!userId) {
@@ -156,9 +151,7 @@ export const updateNote = async (
   }
 ) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
     if (!userId) {
@@ -236,9 +229,7 @@ export const updateNote = async (
 // Delete a note
 export const deleteNote = async (id: string) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getAuthSession();
 
     const userId = session?.user?.id;
     if (!userId) {

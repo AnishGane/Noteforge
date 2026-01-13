@@ -45,7 +45,6 @@ export const auth = betterAuth({
       });
     },
     onPasswordReset: async ({ user }) => {
-      // your logic here
       console.log(`Password for user ${user.email} has been reset.`);
     },
   },

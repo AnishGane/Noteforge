@@ -14,6 +14,7 @@ import { Fragment } from "react";
 import { ModeSwitcher } from "./mode-switcher";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -21,11 +22,13 @@ interface PageWrapperProps {
     label: string;
     path: string;
   }[];
+  initials: string;
 }
 
 export default function PageWrapper({
   children,
   breadCrumbs,
+  initials,
 }: PageWrapperProps) {
   const pathname = usePathname();
 
@@ -69,6 +72,10 @@ export default function PageWrapper({
           </div>
 
           <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+            </Avatar>
             <ModeSwitcher />
             <LogoutPage />
           </div>

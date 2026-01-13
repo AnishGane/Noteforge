@@ -1,21 +1,22 @@
 import { CreateNoteBookButton } from "@/components/create-notebook-button";
 import NoteBookCard from "@/components/notebook-card";
 import PageWrapper from "@/components/page-wrapper";
-import { auth } from "@/lib/auth";
+import { getInitialName } from "@/lib/get-initial-name";
+import { getAuthSession } from "@/server/get-auth-session";
 import { getNoteBooks } from "@/server/notebook";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
   const notebooks = await getNoteBooks();
-  console.log(notebooks);
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getAuthSession();
+  const initialsName = getInitialName(session?.user?.name);
   if (!session) return redirect("/");
 
   return (
-    <PageWrapper breadCrumbs={[{ label: "Dashboard", path: "/dashboard" }]}>
+    <PageWrapper
+      initials={initialsName}
+      breadCrumbs={[{ label: "Dashboard", path: "/dashboard" }]}
+    >
       <CreateNoteBookButton />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">

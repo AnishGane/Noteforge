@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getAuthSession } from "./server/get-auth-session";
 
 export async function proxy(request: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getAuthSession();
 
   const pathname = request.nextUrl.pathname;
 
-  // 1️⃣ Not logged in → block dashboard
+  // Not logged in → block dashboard
   if (!session && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // 2️⃣ Logged in → block landing/login page
+  // Logged in → block landing/login page
   if (session && pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }

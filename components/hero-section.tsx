@@ -1,6 +1,4 @@
-import React from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { TextEffect } from "@/components/ui/text-effect";
