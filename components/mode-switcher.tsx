@@ -17,7 +17,7 @@ export function ModeSwitcher() {
   return (
     <Button
       variant="ghost"
-      className="group/toggle h-8 p-0 w-full"
+      className="group/toggle size-8 p-0 "
       onClick={toggleTheme}
     >
       <SunIcon className="hidden [html.dark_&]:block" />

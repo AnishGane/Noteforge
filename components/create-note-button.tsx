@@ -30,7 +30,10 @@ import { useRouter } from "next/navigation";
 import { createNote } from "@/server/note";
 
 const formSchema = z.object({
-  name: z.string().min(2).max(50),
+  name: z
+    .string()
+    .min(3)
+    .max(15, "Note name must be between 3 and 15 characters"),
 });
 
 export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {

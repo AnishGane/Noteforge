@@ -37,7 +37,7 @@ import {
 import { signInUser } from "@/server/users";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeClosed, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -46,6 +46,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -117,11 +118,24 @@ export function LoginForm({
                           </Link>
                         </div>
                         <FormControl>
-                          <Input
-                            placeholder="******"
-                            type="password"
-                            {...field}
-                          />
+                          <div className="relative ">
+                            <Input
+                              placeholder="******"
+                              type={showPassword ? "text" : "password"}
+                              {...field}
+                            />
+                            {showPassword ? (
+                              <EyeClosed
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 size-4 -translate-y-1/2 text-muted-foreground top-1/2 cursor-pointer"
+                              />
+                            ) : (
+                              <Eye
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 size-4 -translate-y-1/2 top-1/2 cursor-pointer text-muted-foreground"
+                              />
+                            )}
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

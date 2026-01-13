@@ -31,8 +31,8 @@ import { useRouter } from "next/navigation";
 const formSchema = z.object({
   name: z
     .string()
-    .min(2)
-    .max(50, "Notebook name must be between 2 and 50 characters long"),
+    .min(3)
+    .max(15, "Notebook name must be between 2 and 15 characters long"),
 });
 
 export const CreateNoteBookButton = () => {
@@ -70,7 +70,10 @@ export const CreateNoteBookButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max cursor-pointer"><PlusIcon className="size-4" />Create Notebook</Button>
+        <Button className="w-max cursor-pointer">
+          <PlusIcon className="size-4" />
+          Create Notebook
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
