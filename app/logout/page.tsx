@@ -5,8 +5,12 @@ import { LogOutIcon } from "lucide-react";
 
 function LogoutPage() {
   const handleLogout = async () => {
-    await authClient.signOut();
-    window.location.replace ("/");
+    await authClient.signOut({
+      fetchOptions: {
+        credentials: "include",
+      },
+    });
+    window.location.replace("/");
   };
   return (
     <Button variant={"outline"} onClick={handleLogout}>
