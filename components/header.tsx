@@ -69,7 +69,7 @@ export const HeroHeader = () => {
                 <ModeSwitcher />
                 <Button asChild variant="outline" size="sm">
                   <Link href="/login">
-                    <span className="font-medium tracking-wide">Login</span>
+                    <span className="font-normal tracking-wide">Login</span>
                   </Link>
                 </Button>
                 <Button asChild size="sm">

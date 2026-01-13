@@ -42,7 +42,7 @@ export default function HeroSection() {
                   preset="fade-in-blur"
                   speedSegment={0.3}
                   as="h1"
-                  className="mt-8 max-w-2xl text-balance text-5xl font-medium md:text-6xl lg:mt-16"
+                  className="mt-8 max-w-2xl text-balance text-4xl font-medium md:text-6xl lg:mt-16"
                 >
                   🔥Forge Smarter Notes. Code Better
                 </TextEffect>
@@ -71,18 +71,18 @@ export default function HeroSection() {
                     },
                     ...transitionVariants,
                   }}
-                  className="mt-12 flex items-center gap-2"
+                  className="mt-8 flex items-center gap-2"
                 >
                   <div
                     key={1}
-                    className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5"
+                    
                   >
                     <Button
                       asChild
                       size="lg"
-                      className="rounded-xs px-5 text-base"
+                      className="rounded-sm px-5 text-base"
                     >
-                      <Link href="#link">
+                      <Link href="/login">
                         <span className="text-nowrap">Start Forging</span>
                       </Link>
                     </Button>
