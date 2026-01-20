@@ -19,8 +19,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -78,12 +76,6 @@ export default function PageWrapper({
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-
-          {/* <div className="flex items-center gap-3">
-            
-            
-            <LogoutPage />
-          </div> */}
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar>

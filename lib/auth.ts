@@ -14,21 +14,21 @@ const db = client.db();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
-  emailVerification: {
-    sendVerificationEmail: async ({ user, url }) => {
-      await resend.emails.send({
-        from: "NoteForge <onboarding@resend.dev>",
-        to: [user.email],
-        subject: "Email Verification",
-        react: VerificationEmail({
-          userName: user.name,
-          userEmail: user.email,
-          verificationLink: url,
-        }),
-      });
-    },
-    sendOnSignUp: true,
-  },
+  // emailVerification: {
+  //   sendVerificationEmail: async ({ user, url }) => {
+  //     await resend.emails.send({
+  //       from: "NoteForge <onboarding@resend.dev>",
+  //       to: [user.email],
+  //       subject: "Email Verification",
+  //       react: VerificationEmail({
+  //         userName: user.name,
+  //         userEmail: user.email,
+  //         verificationLink: url,
+  //       }),
+  //     });
+  //   },
+  //   sendOnSignUp: true,
+  // },
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {

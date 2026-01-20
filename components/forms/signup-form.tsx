@@ -70,7 +70,8 @@ export function SignUpForm({
           values.name
         );
         res.success
-          ? toast.success("Please check your email for verification")
+          // ? toast.success("Please check your email for verification")
+          ? toast.success("User signed up successfully")
           : toast.error(res.message);
       }
     } catch (error) {
